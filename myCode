@@ -1,0 +1,170 @@
+class Car {
+	  constructor(color) {
+		this.color = color;
+	  };
+	  
+	  move = function() {
+		console.log('Car ' + this.color + ' is moving');
+	  }
+	  
+	  stop = function() {
+		console.log('Car ' + this.color + ' stopped');
+	  }
+	}
+	
+	class Human {
+	  constructor(hairColor) {
+		this.hairColor = hairColor;
+	  };
+	  
+	  move = function() {
+		console.log('Human with hair ' + this.hairColor + ' is moving');
+	  }
+    
+	  stop = function() {
+		console.log('Human with hair ' + this.hairColor +' stopped');
+	  }
+	}
+
+class Stoplight {
+	  constructor(id) {
+	    this.estado = 'rojo';
+      this.id = id;
+      this.currentTime = 0; // for the simulation, the stoplight will work only for 15 seconds
+      this.stopTime = 15000; // for the simulation, the stoplight will work only for 15 seconds
+      this.iniciar();
+    };
+	  
+	  cambiarRojo = function() {
+      this.estado = 'rojo';
+		  console.log('Semaforo ' + this.id + ' cambio a rojo');
+	  }
+  
+    cambiarVerde = function() {
+      this.estado = 'verde';
+		  console.log('Semaforo ' + this.id + ' cambio a verde');
+	  }
+  
+   cambiarAmarillo = function() {
+      this.estado = 'amarillo';
+		  console.log('Semaforo ' + this.id + ' cambio a amarillo');
+	  }
+  
+    stop = function () {
+      this.currentTime = 20000;
+    }
+  
+  /*
+  Function in charge of init the work of the stoplight.
+  */
+    iniciar = function() {
+      var waitingTime = 0;
+      if (this.estado === 'verde') {
+        this.cambiarAmarillo();
+        waitingTime = 2000;
+      } else if (this.estado === 'amarillo') {
+        this.cambiarRojo();
+        waitingTime = 1000;
+      } else {
+        this.cambiarVerde();
+        waitingTime = 2000;
+      }
+      
+      if (this.currentTime < this.stopTime) {
+        this.currentTime += waitingTime;
+        setTimeout(this.iniciar.bind(this), waitingTime); // stoplight state changes every n seconds.
+      }
+    }
+	}
+
+class Queue {
+  constructor(name) {
+    this.name = name;
+    this.elements = [];
+  };
+  
+  /*
+  This functions adds an element to the queue.
+  */
+  enqueue = function (element) {
+    this.elements.push(element);
+  }
+  
+  /*
+  This functions remove an element from the queue.
+  */
+  dequeue = function (){
+    this.elements.pop();
+  }
+  
+  /*
+  This function checks if there are still elements in the queue
+  Returns true if there are still values, false otherwise.
+  */
+  areThereStillElements = function () {
+    return this.elements.length > 0;
+  }
+}
+
+var blueCar = new Car('blue');
+var blackCar = new Car('black');
+var yellowCar = new Car('yellow');
+var whiteCar = new Car('white');
+var pinkCar = new Car('pink');
+var greenCar = new Car('green');
+var greyCar = new Car('grey');
+var purpleCar = new Car('purple');
+var orangeCar = new Car('orange');
+var brownCar = new Car('brown');
+
+var fromLeftToRightCarsQueue = new Queue('leftToRighCars');
+fromLeftToRightCarsQueue.enqueue(blueCar);
+fromLeftToRightCarsQueue.enqueue(blackCar);
+fromLeftToRightCarsQueue.enqueue(yellowCar);
+fromLeftToRightCarsQueue.enqueue(whiteCar);
+fromLeftToRightCarsQueue.enqueue(pinkCar);
+fromLeftToRightCarsQueue.enqueue(greenCar);
+fromLeftToRightCarsQueue.enqueue(greyCar);
+fromLeftToRightCarsQueue.enqueue(purpleCar);
+fromLeftToRightCarsQueue.enqueue(orangeCar);
+fromLeftToRightCarsQueue.enqueue(brownCar);
+
+/*
+  var fromTopToBottomCarsQueue = new Queue('TopToBottom');
+  fromTopToBottomCarsQueue.enqueue(greenCar);
+  fromTopToBottomCarsQueue.enqueue(greyCar);
+  fromTopToBottomCarsQueue.enqueue(purpleCar);
+  fromTopToBottomCarsQueue.enqueue(orangeCar);
+  fromTopToBottomCarsQueue.enqueue(brownCar);
+*/
+
+var stopLightLeftToRight = new Stoplight('leftToRight');
+
+/*
+Función encargada de administrar el tráfico en una ciudad.
+Con una coordinación clara entre semáforos, todos los carros y peatones en una intersección
+podrán cruzar de un punto A a un punto B sin correr riesgo de chocar o ser atropellados.
+*/
+function trafficHandler() {
+  
+  var contadorCarrosCruzaron = 0; // pueden cruzar solo 2 carros por estado del semaforo
+  while (fromLeftToRightCarsQueue.areThereStillElements()) {
+    console.log('Aun hay: ' + fromLeftToRightCarsQueue.elements.length + ' carros por cruzar');
+    if ((stopLightLeftToRight.estado === 'verde' || stopLightLeftToRight.estado === 'amarillo') && contadorCarrosCruzaron < 2) {
+      console.log('Desencolando el carro: ' + fromLeftToRightCarsQueue.elements[fromLeftToRightCarsQueue.elements.length-1].color);
+      fromLeftToRightCarsQueue.dequeue(); // cruzar el semáforo
+      contadorCarrosCruzaron += 1;
+    } else {
+      contadorCarrosCruzaron = 0;
+      console.log('está en rojo, deben esperar: ' + fromLeftToRightCarsQueue.elements.length + ' carros');
+    }
+  }
+  
+  // a stoplight usually works nonstop. But for this simulation effects we are stopping it when there are no more cars
+  // on the queues
+  stopLightLeftToRight.stop();
+}
+
+trafficHandler();
+
+
